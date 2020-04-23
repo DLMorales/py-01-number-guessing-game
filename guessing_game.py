@@ -13,47 +13,122 @@ NOTE: If you strongly prefer to work locally on your own computer, you can
 
 import os
 import random
+from typing import List
 
 
 # These are DEFAULT values
+LINE_LENGTH = 80
 RANGE_START = 1
 RANGE_STOP = 100
 
-def display_title_banner() -> None:
-    title_banner = "\n\t\t\tGUESS THE NUMBER!" + \
-                   "\n\t\t    A Game of Informed Choice\n"
-    print(title_banner)
+
+# Global Variables
+attempts = []
+attempt_low = RANGE_STOP - RANGE_START
+attempt_high = 0
+games_won = 0
+
+def reset_global() -> None:
+    global RANGE_START
+    global RANGE_STOP
+    global attempts
+    global attempt_low
+    global attempt_high
+    
+    attempts = []
+    attempt_low = RANGE_STOP - RANGE_START
+    attempt_high = 0
+    games_won = 0
 
 
-def display_help() -> None:
-    help_msg = "(Press 'Q' to quit at anytime.)"
-    print(help_msg)
+def display_title_banner() -> None: #01
+    _ = os.system("clear")
+    title = "GUESS THE NUMBER!"
+    subtitle = "A Game of Informed Choice"
 
-
-def display_welcome_message() -> str:
-    welcome_msg = "Welcome to 'Guess a Number!', the game where you try " + \
-                  "to guess which number I'm artificially thinking of!"
-    name_prompt = "\nBefore we begin, would you please tell me your name? >  "
-    print(welcome_msg)
+    print_divider("*")
+    print()
+    print(f"{title:^{LINE_LENGTH}}")
+    print(f"{subtitle:^{LINE_LENGTH}}")
     display_help()
+    print()
+    print_divider("*")
+    display_stats()
+    print_divider("-")
+
+
+def print_divider(character: str) -> None: #02
+    print(character * LINE_LENGTH)
+
+
+def plural_s(count: int) -> str:
+    return "s" if count > 1 else ""
+
+
+def display_stats() -> None:
+    global attempt_low
+    global attempt_high
+    attempts_str = attempts_list_to_string()
+    low_and_high_str = f"LEAST TRIES: {attempt_low}  MOST TRIES: {attempt_high}"
+    stat_str = f"Least Tries: {attempt_low} | " + \
+               f"Most Tries: {attempt_high} | " + \
+               f"Wins: {games_won} | " + \
+               attempts_str
+    print(stat_str)
+
+
+def display_help() -> None: #03
+    help_msg = "(Enter 'Q' at anytime to quit)"
+    print(f"{help_msg:^{LINE_LENGTH}}")
+
+
+def display_welcome_message() -> str:   #04
+    welcome_msg = "\nWelcome to 'Guess a Number!', the game where you try " + \
+                  "to guess which number I'm " + \
+                  f"\nartificially thinking of between {RANGE_START} and " + \
+                  f"{RANGE_STOP}!"
+    name_prompt = "\nBefore we begin, would you please tell me your name? >  "
+    print(f"{welcome_msg:<{LINE_LENGTH}}")
     return input(name_prompt)
 
 
-def display_program_exit(name: str = "") -> None:
+def display_program_exit(name: str = "") -> None: #05
     name_part = "" if len(name) == 0 else (", " + name)
-    program_exit_msg = f"\nThank you for playing{name_part}!"
+    program_exit_msg = f"\nThank you for playing{name_part}!\n"
     print(program_exit_msg)
+    print_divider("=")
+    print()
 
 
-def check_for_quit(user_input: str) -> bool:
+def display_attempts(attempts_list: List[int]) -> None: #06
+    # https://stackoverflow.com/questions/3590165/join-a-list-of-items-with-different-types-as-string-in-python
+    attempts_string = "ATTEMPTS: " + ", ".join(str(x) for x in attempts_list)
+    print(attempts_string)
+
+
+def attempts_list_to_string() -> str:
+    global attempts
+    s = "Guesses: " # 's' stands for 'string'
+    d = ", "         # 'd' stands for 'delimiter'
+    e = "..., "    # 'e' stands for 'ellipsis'
+
+    if len(attempts) > 5:
+        s = s + e + d.join(str(x) for x in attempts[-5:])
+    else:
+        s = s + d.join(str(x) for x in attempts)
+    
+    return s
+
+
+def check_for_quit(user_input: str) -> bool: #07
     return user_input.lower() == "q"
 
 
-def check_for_yes(user_input: str) -> bool:
+def check_for_yes(user_input: str) -> bool: #08
     return user_input.lower() == "y"
 
 
-def verify_quit() -> bool:
+def verify_quit() -> bool: #09
     verify_q_prompt = "\nLooks like you entered 'Q'.\n" + \
                       "Did you want to quit? Y/N >  "
     n_msg = "\nOkay, got it! Thanks for confirming!"
@@ -68,7 +143,7 @@ def verify_quit() -> bool:
         return False
 
 
-def wants_to_quit(user_input: str, user_name: str = "") -> bool:
+def wants_to_quit(user_input: str, user_name: str = "") -> bool: #10
     if check_for_quit(user_input):
         if verify_quit():
             display_program_exit(user_name)
@@ -77,9 +152,10 @@ def wants_to_quit(user_input: str, user_name: str = "") -> bool:
     return False
 
 
-def prompt_for_guess(user_name: str) -> int:
-    guess_prompt = "\nWhat is your guess? >  "
-    retry_msg = "Please try again."
+def prompt_for_guess(user_name: str) -> int: #11
+    guess_prompt = "\nWhat's your guess between " + \
+                  f"{RANGE_START} and {RANGE_STOP}? >  "
+    retry_msg = "\nPlease try again."
 
     while True:
         user_guess = input(guess_prompt)
@@ -90,6 +166,7 @@ def prompt_for_guess(user_name: str) -> int:
             user_guess = validate_input_int(user_guess)
         except ValueError as err:
             print("\nINVALID GUESS: ")
+            print("--------------")
             print(err)
         else:
             return user_guess
@@ -97,9 +174,11 @@ def prompt_for_guess(user_name: str) -> int:
         print(retry_msg)
 
 
-def validate_input_int(user_input: str) -> int:
-    err_msg_not_an_int = "Please enter a number, unless you want to quit..."
-    err_msg_out_bounds = "You must pick a number between " + \
+def validate_input_int(user_input: str) -> int: #12
+    err_msg_not_an_int = f"'{user_input}' is not a number...\n" + \
+                          "\t...Please enter a number...\n" + \
+                          "\t\t...unless you WANT to quit..."
+    err_msg_out_bounds = "{user_input} isn't a number between " + \
                          f"{RANGE_START} and {RANGE_STOP}."
 
     try:
@@ -113,12 +192,13 @@ def validate_input_int(user_input: str) -> int:
             return guess
 
 
-def play_again() -> bool:
+def play_again() -> bool: #13
     again_prompt = "\nWould you like to play again? Y/N >  "
     n_msg = "\nYou got it!"
     y_msg = "\nExcellent! I'm glad you're enjoying it!"
 
     user_input = input(again_prompt)
+    display_title_banner()
     if check_for_yes(user_input):
         print(y_msg)
         return True
@@ -128,14 +208,15 @@ def play_again() -> bool:
 
 
 def start_game() -> None:
-    # Everthing outside of the Outer Game Loop is set once initially, and then
-    #   used throughout the two loops.
+    global attempts
+    global attempt_low
+    global attempt_high
+    global games_won
+
     display_title_banner()
-    # These variables will be used all the way till the games exit, and are 
-    #   therefore being set outside of loops
     user_name = display_welcome_message()
-    # Checking for the edge case where the User enters 'Q' as a name and not
-    #   to quit.
+    
+    display_title_banner()
     if wants_to_quit(user_name):
         return
     elif len(user_name) == 0:
@@ -145,40 +226,17 @@ def start_game() -> None:
         print(f"\nThank you, {user_name}!")
     
     while True:
-        # This is the Outer Game Loop, it is responsible for resetting the game
-        #   if the User would like to play again.
-        #x   -   Select the random number
-        #x   -   Initialize the Attempts list
-        attempts = []
         win_case = random.randint(RANGE_START, RANGE_STOP)
-        # For DEBUG only, remove before final
-        print(f"The low num is: {RANGE_START}\nThe high num is: {RANGE_STOP}")
         print(f"The win case is: {win_case}")
 
         while True:
-            print("\#-- INSIDE INNER LOOP --\#")
-            # This is the INNER GAME LOOP. It will:
-            #   -   Let the User know that what the range is
-            #   -   Prompt the User for their answer
-            #       -   Validate that the User's answer is within range and of
-            #           the appropriate type, and raise a ValueError if it 
-            #           violates either of those two things.
-            #   -   Let the User know if they are too low, too high, or right
-            #       on
-            #       -   If the User is too high or too low, add guess to 
-            #           attempts at list, let them know, and loop 
-            #       -   If the User guessed correctly, congratulate them, 
-            #           display their attempts and attempt counts, and exit the 
-            #           loop
-            #   -   Ask the User if the would like to play again
-            #       -   If yes, then re-outer-loop
-            #       -   If no, then exit-outer-loop
             user_input = prompt_for_guess(user_name)
-            # This will check if the User wants to quit
+
             if user_input == -1:
                 return
 
             attempts.append(user_input)
+            display_title_banner()
             if user_input < win_case:
                 print(f"\n{user_input} is too low!")
                 continue
@@ -186,20 +244,30 @@ def start_game() -> None:
                 print(f"\n{user_input} is too high!")
                 continue
             else:
-                print(f"\n{user_input} is the winning answer!\nCONGRATULATIONS!")
-                print(f"You solved it in {len(attempts)} attempts!")
+                games_won += 1
+                final_attempt_count = len(attempts)
+                s = plural_s(final_attempt_count)
+                if attempt_low > final_attempt_count:
+                    attempt_low = final_attempt_count
+
+                if attempt_high < final_attempt_count:
+                    attempt_high = final_attempt_count
+
+                display_title_banner()
+
+                print(f"\nCONGRATULATIONS, {user_name.upper()}!!!")
+                print(f"\n{user_input} is the winning guess!")
+                print(f"You solved it in {final_attempt_count} attempt{s}!")
             
             break
 
-        # AFTER INNER LOOP EXIT: Prompt the User to see if they would like to 
-        #   play again
         if play_again():
+            attempts = []
+            #display_title_banner()
             continue
         else:
             break
 
-    # AFTER OUTER LOOP EXIT: Point #5 part B, letting the User known when the 
-    #   program is exiting 
     display_program_exit(user_name)
 
 
