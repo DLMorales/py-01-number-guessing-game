@@ -225,7 +225,7 @@ def start_game() -> None:
         return
     elif len(user_name) == 0:
         user_name = "Anonymous Jones"
-        print(f"\nInto anonymity, eh? I'll call you {user_name}!")
+        print(f"\nPrefer anonymity, eh? I'll call you {user_name}!")
     else:
         print(f"\nThank you, {user_name}!")
     
