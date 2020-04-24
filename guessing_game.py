@@ -10,23 +10,48 @@ NOTE: If you strongly prefer to work locally on your own computer, you can
       menu after you fork the snapshot of this workspace.
 
 """
-
-import os
+#------------------------------------------------------------------------------
+# NOTE TO THE REVIEWER
+#------------------------------------------------------------------------------
+#   I am trying for an EXCEEDS grade on this project. Please reject it if all 
+#   'Exceeds' criteria are not met. Thank you!
+#------------------------------------------------------------------------------
+# IMPORT STATEMENTS
+#------------------------------------------------------------------------------
+import os # see the note in the display_title_banner function body
 import random
 
 
-# These are DEFAULT values
+#------------------------------------------------------------------------------
+# CONSTANT VARIABLES
+#------------------------------------------------------------------------------
 LINE_LENGTH = 80
 RANGE_START = 1
 RANGE_STOP = 100
 
 
-# Global Variables
+#------------------------------------------------------------------------------
+# GLOBAL VARIABLES
+#------------------------------------------------------------------------------
 attempts = []
 attempt_low = RANGE_STOP - RANGE_START
 attempt_high = 0
 games_won = 0
 
+
+#------------------------------------------------------------------------------
+# FUNCTION DEFINITONS
+#------------------------------------------------------------------------------
+# NOTE: I have used function annotations to help make the code easier to read.
+# Additional information can be found on the following webpages:
+# -> https://www.python.org/dev/peps/pep-3107/
+# -> https://www.geeksforgeeks.org/function-annotations-python/
+#
+# NOTE: I have made use of formatted string literals (like A LOT) through out
+# the following code. The following are the resources I used for reference:
+# -> https://realpython.com/python-string-formatting/
+# -> https://docs.python.org/3/library/string.html#format-string-syntax
+# -> https://docs.python.org/3/library/string.html#format-specification-mini-language
 
 def reset_attempts() -> None:
     global attempts
@@ -46,7 +71,17 @@ def reset_globals() -> None:
     games_won = 0
 
 
-def display_title_banner() -> None: #01
+def display_title_banner() -> None:
+    # NOTE on using the 'os' module:
+    # In the Kenneth Love instructional videos, he had a project where he
+    # would create a dungeon using multidimensional lists. In order, to 
+    # keep from having to print out multiple copies of the 'dungeon' to the
+    # User's console, he used something to clear the console. To that end, 
+    # I used the following references to implement the behavior in my program:
+    # -> https://www.geeksforgeeks.org/clear-screen-python/
+    # -> https://www.quora.com/Is-there-a-Clear-screen-function-in-Python
+    # I have tested the below statement in Windows 10 using PowerShell 7.0, 
+    # and it works.
     _ = os.system("clear")
     title = "GUESS THE NUMBER!"
     subtitle = "A Game of Informed Choice"
@@ -62,12 +97,14 @@ def display_title_banner() -> None: #01
     print_divider("-")
 
 
-def print_divider(character: str) -> None: #02
+def print_divider(character: str) -> None:
     global LINE_LENGTH
     print(character * LINE_LENGTH)
 
 
 def plural_s(count: int) -> str:
+    # Using the ternary operator for conciseness
+    # -> https://www.geeksforgeeks.org/ternary-operator-in-python/
     return "s" if count > 1 else ""
 
 
@@ -83,12 +120,12 @@ def display_stats() -> None:
     print(stat_str)
 
 
-def display_help() -> None: #03
+def display_help() -> None:
     help_msg = "(Enter 'Q' at anytime to quit)"
     print(f"{help_msg:^{LINE_LENGTH}}")
 
 
-def display_welcome_message() -> str:   #04
+def display_welcome_message() -> str:
     welcome_msg = "\nWelcome to 'Guess a Number!', the game where you try " + \
                   "to guess which number I'm " + \
                   f"\nartificially thinking of between {RANGE_START} and " + \
@@ -98,7 +135,9 @@ def display_welcome_message() -> str:   #04
     return input(name_prompt)
 
 
-def display_program_exit(name: str = "") -> None: #05
+def display_program_exit(name: str = "") -> None:
+    # Using the ternary operator for conciseness
+    # -> https://www.geeksforgeeks.org/ternary-operator-in-python/
     name_part = "" if len(name) == 0 else (", " + name)
     program_exit_msg = f"\nThank you for playing{name_part}!\n"
     print(program_exit_msg)
@@ -107,6 +146,7 @@ def display_program_exit(name: str = "") -> None: #05
 
 
 def attempts_list_to_string() -> str:
+    # Apparently, a list of 'ints' don't like to be easily joined :(
     # https://stackoverflow.com/questions/3590165/join-a-list-of-items-with-different-types-as-string-in-python
     global attempts
     attempts_count = len(attempts)
@@ -122,15 +162,15 @@ def attempts_list_to_string() -> str:
     return s
 
 
-def check_for_quit(user_input: str) -> bool: #07
+def check_for_quit(user_input: str) -> bool:
     return user_input.lower() == "q"
 
 
-def check_for_yes(user_input: str) -> bool: #08
+def check_for_yes(user_input: str) -> bool:
     return user_input.lower() == "y"
 
 
-def verify_quit() -> bool: #09
+def verify_quit() -> bool:
     verify_q_prompt = "\nLooks like you entered 'Q'.\n" + \
                       "Did you want to quit? Y/N >  "
     n_msg = "\nOkay, got it! Thanks for confirming!"
@@ -145,7 +185,7 @@ def verify_quit() -> bool: #09
         return False
 
 
-def wants_to_quit(user_input: str, user_name: str = "") -> bool: #10
+def wants_to_quit(user_input: str, user_name: str = "") -> bool:
     if check_for_quit(user_input):
         if verify_quit():
             display_program_exit(user_name)
@@ -154,7 +194,7 @@ def wants_to_quit(user_input: str, user_name: str = "") -> bool: #10
     return False
 
 
-def prompt_for_guess(user_name: str) -> int: #11
+def prompt_for_guess(user_name: str) -> int:
     guess_prompt = "\nWhat's your guess between " + \
                   f"{RANGE_START} and {RANGE_STOP}? >  "
     retry_msg = "\nPlease try again."
@@ -176,7 +216,7 @@ def prompt_for_guess(user_name: str) -> int: #11
         print(retry_msg)
 
 
-def validate_input_int(user_input: str) -> int: #12
+def validate_input_int(user_input: str) -> int:
     err_msg_not_an_int = f"'{user_input}' is not a number...\n" + \
                           "\t...Please enter a number...\n" + \
                           "\t\t...unless you WANT to quit..."
@@ -186,6 +226,8 @@ def validate_input_int(user_input: str) -> int: #12
     try:
         guess = int(user_input)
     except ValueError:
+        # Use this to create a custom (read: more user friendly) ValueError
+        # for 'user_input' that can't be coerced to a 'int'
         raise ValueError(err_msg_not_an_int)
     else:
         if guess < RANGE_START or guess > RANGE_STOP:
@@ -194,7 +236,7 @@ def validate_input_int(user_input: str) -> int: #12
             return guess
 
 
-def play_again() -> bool: #13
+def play_again() -> bool:
     again_prompt = "\nWould you like to play again? Y/N >  "
     n_msg = "\nYou got it!"
     y_msg = "\nExcellent! I'm glad you're enjoying it!"
@@ -231,11 +273,15 @@ def start_game() -> None:
     
     while True:
         win_case = random.randint(RANGE_START, RANGE_STOP)
-        #DEBUG: print(f"The win case is: {win_case}")
+        #DEBUG: 
+        #print(f"The win case is: {win_case}")
 
         while True:
             user_input = prompt_for_guess(user_name)
 
+            # The function 'prompt_for_guess()' always returns an integer, 
+            # BUT would need a major redesign consideration if the game were 
+            # to be extended to accomodate a range that spans negative numbers.
             if user_input == -1:
                 return
 
@@ -274,65 +320,45 @@ def start_game() -> None:
     reset_globals()
 
 
-    """Psuedo-code Hints
-    
-    When the program starts, we want to:
-    ------------------------------------
-    x01. Display an intro/welcome message to the player.
-    02. Store a random number as the answer/solution.
-    03. Continuously prompt the player for a guess.
-        a.  If the guess greater than the solution, display to the player 
-            "It\'s lower".
-        b.  If the guess is less than the solution, display to the player 
-            "It\'s higher".
-    
-    04. Once the guess is correct, stop looping, inform the user they "Got it"
-        and show how many attempts it took them to get the correct number.
-    05. Let the player know the game is ending, or something that indicates 
-        the game is over.
-    
-    ( You can add more features/enhancements if you\'d like to. )
-
-    EXTRA CREDIT
-    ------------------------------------
-    01. As a player of the game, my guess should be within the number range. 
-        If my guess is outside the guessing range I should be told to try 
-        again.
-    02. As a player of the game, after I guess correctly I should be 
-        prompted if I would like to play again.
-    03. As a player of the game, at the start of each game I should be shown 
-        the current high score (least amount of points) so that I know what 
-        I am supposed to beat.
-    04. Every time a new game is started, the random number guess should be 
-        changed so players are guessing something new.
-    """
-    # write your code inside this function.
-
-    #x Display Intro Message and Banner
-    #x Display Instructions and Help
-    # Prompt for Game Mode: Regular, Custom, Computer Guess
-        # Regular: User guesses between 1 and 10
-        # Custom: User chooses the range upper limit
-        # Computer Guess: User picks a number between 1 and 100
-        # Multiples Of: User picks a number, the program generates a list of 
-        #               multiples of that number based on 1 - 20, and the 
-        #               User has to guess which multiple it is.
-    # Store the randomly selected wincase number in a variable
-    # Get guess input from the User
-        # Validate User input and reloop if received inappropriate response
-    # Check against the answer
-        # If no the answer
-            #Reloop and let them know "Too High!" or "Too Low!"
-        # Else
-            # Let them know they are correct
-    # Display Exit Message
-    '''
-    OUTER LOOP TODO:
-        #   -   What version of the game does the User want to play
-        #   -   Populate the ranges
-    '''
-
-
+#------------------------------------------------------------------------------
+# PROGRAM RUN START
+#------------------------------------------------------------------------------
 if __name__ == '__main__':
     # Kick off the program by calling the start_game function.
     start_game()
+
+#------------------------------------------------------------------------------
+# PSEUDO-CODE HINTS
+#------------------------------------------------------------------------------
+"""Psuedo-code Hints
+
+When the program starts, we want to:
+------------------------------------
+01. Display an intro/welcome message to the player.
+02. Store a random number as the answer/solution.
+03. Continuously prompt the player for a guess.
+    a.  If the guess greater than the solution, display to the player 
+        "It\'s lower".
+    b.  If the guess is less than the solution, display to the player 
+        "It\'s higher".
+
+04. Once the guess is correct, stop looping, inform the user they "Got it"
+    and show how many attempts it took them to get the correct number.
+05. Let the player know the game is ending, or something that indicates 
+    the game is over.
+
+( You can add more features/enhancements if you\'d like to. )
+
+EXTRA CREDIT
+------------------------------------
+01. As a player of the game, my guess should be within the number range. 
+    If my guess is outside the guessing range I should be told to try 
+    again.
+02. As a player of the game, after I guess correctly I should be 
+    prompted if I would like to play again.
+03. As a player of the game, at the start of each game I should be shown 
+    the current high score (least amount of points) so that I know what 
+    I am supposed to beat.
+04. Every time a new game is started, the random number guess should be 
+    changed so players are guessing something new.
+"""
