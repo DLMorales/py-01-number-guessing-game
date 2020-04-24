@@ -13,7 +13,6 @@ NOTE: If you strongly prefer to work locally on your own computer, you can
 
 import os
 import random
-from typing import List
 
 
 # These are DEFAULT values
@@ -28,7 +27,13 @@ attempt_low = RANGE_STOP - RANGE_START
 attempt_high = 0
 games_won = 0
 
-def reset_global() -> None:
+
+def reset_attempts() -> None:
+    global attempts
+    attempts = []
+
+
+def reset_globals() -> None:
     global RANGE_START
     global RANGE_STOP
     global attempts
@@ -58,6 +63,7 @@ def display_title_banner() -> None: #01
 
 
 def print_divider(character: str) -> None: #02
+    global LINE_LENGTH
     print(character * LINE_LENGTH)
 
 
@@ -100,19 +106,15 @@ def display_program_exit(name: str = "") -> None: #05
     print()
 
 
-def display_attempts(attempts_list: List[int]) -> None: #06
-    # https://stackoverflow.com/questions/3590165/join-a-list-of-items-with-different-types-as-string-in-python
-    attempts_string = "ATTEMPTS: " + ", ".join(str(x) for x in attempts_list)
-    print(attempts_string)
-
-
 def attempts_list_to_string() -> str:
+    # https://stackoverflow.com/questions/3590165/join-a-list-of-items-with-different-types-as-string-in-python
     global attempts
-    s = "Guesses: " # 's' stands for 'string'
+    attempts_count = len(attempts)
+    s = f"Guesses[{attempts_count}]: " # 's' stands for 'string'
     d = ", "         # 'd' stands for 'delimiter'
     e = "..., "    # 'e' stands for 'ellipsis'
 
-    if len(attempts) > 5:
+    if attempts_count > 5:
         s = s + e + d.join(str(x) for x in attempts[-5:])
     else:
         s = s + d.join(str(x) for x in attempts)
@@ -198,8 +200,9 @@ def play_again() -> bool: #13
     y_msg = "\nExcellent! I'm glad you're enjoying it!"
 
     user_input = input(again_prompt)
-    display_title_banner()
     if check_for_yes(user_input):
+        reset_attempts()
+        display_title_banner()
         print(y_msg)
         return True
     else:
@@ -218,6 +221,7 @@ def start_game() -> None:
     
     display_title_banner()
     if wants_to_quit(user_name):
+        reset_globals()
         return
     elif len(user_name) == 0:
         user_name = "Anonymous Jones"
@@ -227,7 +231,7 @@ def start_game() -> None:
     
     while True:
         win_case = random.randint(RANGE_START, RANGE_STOP)
-        print(f"The win case is: {win_case}")
+        #DEBUG: print(f"The win case is: {win_case}")
 
         while True:
             user_input = prompt_for_guess(user_name)
@@ -262,13 +266,12 @@ def start_game() -> None:
             break
 
         if play_again():
-            attempts = []
-            #display_title_banner()
             continue
         else:
             break
 
     display_program_exit(user_name)
+    reset_globals()
 
 
     """Psuedo-code Hints
